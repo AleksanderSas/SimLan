@@ -4,6 +4,16 @@ namespace SimLan.Evaluator
 {
     class BaseComputable
     {
+        public virtual BaseComputable Clone()
+        {
+            return this;
+        }
+
+        public virtual BaseComputable ExecuteOperation(string opr, BaseComputable rigth)
+        {
+            throw new System.Exception("Variable doesn't support operator " + opr);
+        }
+
         public virtual BaseComputable CallFunction(IList<BaseComputable> args)
         {
             throw new System.Exception("Variable is not a function");

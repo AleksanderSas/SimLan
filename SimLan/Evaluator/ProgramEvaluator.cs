@@ -25,7 +25,7 @@ namespace SimLan.Evaluator
 
         public override Do VisitIf_statement([NotNull] SimLanParser.If_statementContext context)
         {
-            if(_evaluationContext.ArthmeticEvaluator.VisitLogical_statement_1(context.logical_statement_1()) > 0)
+            if(_evaluationContext.ArthmeticEvaluator.VisitLogical_statement_1(context.logical_statement_1()).GetValue() > 0)
             {
                 context.b1.Accept(this);
             }
@@ -42,7 +42,7 @@ namespace SimLan.Evaluator
 
         public override Do VisitAssignment([NotNull] SimLanParser.AssignmentContext context)
         {
-            var value = new SimpleValue(context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator));
+            var value = context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator);
             _evaluationContext.Variables[context.ID().GetText()] = value;
 
             return Do.Notking;
@@ -51,13 +51,13 @@ namespace SimLan.Evaluator
         public override Do VisitReturn_statement([NotNull] SimLanParser.Return_statementContext context)
         {
             //FunctionResult = new SimpleValue(context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator));
-            throw new ReturnException(new SimpleValue(context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator)));
+            throw new ReturnException(context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator));
         }
 
         public override Do VisitFor_statement([NotNull] SimLanParser.For_statementContext context)
         {
             context.a1.Accept(this);
-            while(context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator) > 0)
+            while(context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator).GetValue() > 0)
             {
                 context.block().Accept(this);
                 context.a2.Accept(this);

@@ -42,7 +42,7 @@ namespace SimLan.Evaluator
             var lexer = new SimLanLexer(new AntlrInputStream(input));
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             var parser = new SimLanParser(tokens);
-            int result = ArthmeticEvaluator.VisitLogical_statement_1(parser.logical_statement_1());
+            int result = ArthmeticEvaluator.VisitLogical_statement_1(parser.logical_statement_1()).GetValue();
             return result;
         }
     }

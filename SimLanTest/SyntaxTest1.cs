@@ -79,6 +79,12 @@ namespace SimLan
         }
 
         [Test]
+        public void LValueIsNotModified()
+        {
+            Assert.AreEqual(16, evaluator.RunProgram("main(){ x = 4; return x + x + x + x; }"));
+        }
+
+        [Test]
         public void For()
         {
             Assert.AreEqual(48, evaluator.RunProgram("main(){ x = 42; for(i = 0; i < 3; i = i + 1;) x = x + 2; return x; }"));
@@ -93,7 +99,7 @@ namespace SimLan
         [Test]
         public void PassFunctionAsArgument()
         {
-            Assert.AreEqual(20, evaluator.RunProgram("foo(func){ return func(11); } goo(x){ return x * 2; } main(){ return foo(goo); }"));
+            Assert.AreEqual(22, evaluator.RunProgram("foo(func){ return func(11); } goo(x){ return x * 2; } main(){ return foo(goo); }"));
         }
 
         [TestCase("main(){ if( 1 < 2 )return 10; return 12; }", 10)]

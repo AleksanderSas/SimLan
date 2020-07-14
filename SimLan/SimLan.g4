@@ -38,7 +38,7 @@ arthmetic_statement_2: arthmetic_value arthmetic_statement_2_2;
 arthmetic_statement_2_2: OPERATOR_2 arthmetic_value arthmetic_statement_2_2 | ;
 arthmetic_value: simpleValue | LPAR arthmetic_statement_1 RPAR;
 
-simpleValue: NUM | ID args?;
+simpleValue: NUM | ID args*;
 
 /*
  * Lexer Rules

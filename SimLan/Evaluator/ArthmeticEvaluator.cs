@@ -15,7 +15,7 @@ namespace SimLan.Evaluator
             _evaluationContext = evaluationContext;
         }
 
-        public override BaseComputable VisitLogical_statement_1([NotNull] SimLanParser.Logical_statement_1Context context)
+        public override BaseComputable VisitLogical_statement_1([NotNull] Logical_statement_1Context context)
         {
             BaseComputable value = context.logical_statement_2().Accept(this);
             var sub = context.logical_statement_1_2();
@@ -36,7 +36,7 @@ namespace SimLan.Evaluator
             return value;
         }
 
-        public override BaseComputable VisitLogical_statement_2([NotNull] SimLanParser.Logical_statement_2Context context)
+        public override BaseComputable VisitLogical_statement_2([NotNull] Logical_statement_2Context context)
         {
             BaseComputable value = context.logical_value().Accept(this);
             var sub = context.logical_statement_2_2();
@@ -73,7 +73,7 @@ namespace SimLan.Evaluator
             return leftValue.ExecuteOperation(context.CMP().GetText(), rigthValue);
         }
 
-        public override BaseComputable VisitArthmetic_statement_1([NotNull] SimLanParser.Arthmetic_statement_1Context context)
+        public override BaseComputable VisitArthmetic_statement_1([NotNull] Arthmetic_statement_1Context context)
         {
             BaseComputable value = context.arthmetic_statement_2().Accept(this);
             var sub = context.arthmetic_statement_1_2();
@@ -95,7 +95,7 @@ namespace SimLan.Evaluator
             return value;
         }
 
-        public override BaseComputable VisitArthmetic_statement_2([NotNull] SimLanParser.Arthmetic_statement_2Context context)
+        public override BaseComputable VisitArthmetic_statement_2([NotNull] Arthmetic_statement_2Context context)
         {
             BaseComputable value = context.arthmetic_value().Accept(this);
             var sub = context.arthmetic_statement_2_2();
@@ -131,7 +131,7 @@ namespace SimLan.Evaluator
             return base.VisitArthmetic_statement_1_2(context);
         }
 
-        public override BaseComputable VisitSimpleValue([NotNull] SimLanParser.SimpleValueContext context)
+        public override BaseComputable VisitSimpleValue([NotNull] SimpleValueContext context)
         {
             //simple constant
             if(context.NUM() != null)
@@ -146,13 +146,17 @@ namespace SimLan.Evaluator
             }
 
             //variable
-            if(context.args() == null)
+            if(!context.args().Any())
             {
                 return runnable.Clone();
             }
 
-            //function
-            return CallFunction(runnable, context.args());
+            //function calls
+            foreach(var args in context.args())
+            {
+                runnable = CallFunction(runnable, args);
+            }
+            return runnable;
         }
 
         private BaseComputable CallFunction(BaseComputable function, ArgsContext args)

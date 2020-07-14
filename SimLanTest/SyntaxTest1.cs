@@ -102,6 +102,12 @@ namespace SimLan
             Assert.AreEqual(22, evaluator.RunProgram("foo(func){ return func(11); } goo(x){ return x * 2; } main(){ return foo(goo); }"));
         }
 
+        [Test]
+        public void ReturnFunctionAndDoubleCall()
+        {
+            Assert.AreEqual(22, evaluator.RunProgram("foo(){ return goo; } goo(x){ return x * 2; } main(){ return foo()(11); }"));
+        }
+
         [TestCase("main(){ if( 1 < 2 )return 10; return 12; }", 10)]
         [TestCase("main(){ if( 1 > 2 )return 10; return 12; }", 12)]
         public void ReturnTerminateExecution(string program, int expectedValue)
@@ -142,7 +148,7 @@ namespace SimLan
                   x_1 = x_1 + tmp;
                }
 
-               return x_1
+               return x_1;
             }
 
             main() { return fib(8); }

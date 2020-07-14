@@ -6,7 +6,7 @@ namespace SimLan.Evaluator
 {
     class Do
     {
-        public static Do Notking;
+        public static Do Nothing;
     }
 
     class ProgramEvaluator : SimLanBaseVisitor<Do>
@@ -15,7 +15,7 @@ namespace SimLan.Evaluator
 
         protected override Do AggregateResult(Do aggregate, Do nextResult)
         {
-            return Do.Notking;
+            return Do.Nothing;
         }
 
         public ProgramEvaluator(EvaluationContext evaluationContext)
@@ -37,7 +37,7 @@ namespace SimLan.Evaluator
                 }
             }
 
-            return Do.Notking;
+            return Do.Nothing;
         }
 
         public override Do VisitAssignment([NotNull] SimLanParser.AssignmentContext context)
@@ -45,12 +45,11 @@ namespace SimLan.Evaluator
             var value = context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator);
             _evaluationContext.Variables[context.ID().GetText()] = value;
 
-            return Do.Notking;
+            return Do.Nothing;
         }
 
         public override Do VisitReturn_statement([NotNull] SimLanParser.Return_statementContext context)
         {
-            //FunctionResult = new SimpleValue(context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator));
             throw new ReturnException(context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator));
         }
 
@@ -62,16 +61,16 @@ namespace SimLan.Evaluator
                 context.block().Accept(this);
                 context.a2.Accept(this);
             }
-            return Do.Notking;
+            return Do.Nothing;
         }
 
         public override Do VisitFunction([NotNull] SimLanParser.FunctionContext context)
         {
             var funcName = context.ID().GetText();
-            var function = new Function(GetFuncArgs(context.args_def()), context.block(), _evaluationContext.Variables);
+            var function = new Function(GetFuncArgs(context.args_def()), context.block(), _evaluationContext.Variables, funcName);
             _evaluationContext.Variables.Add(funcName, function);
 
-            return Do.Notking;
+            return Do.Nothing;
         }
 
         private IList<string> GetFuncArgs(SimLanParser.Args_defContext argsDef)

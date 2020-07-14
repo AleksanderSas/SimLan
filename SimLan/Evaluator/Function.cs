@@ -8,11 +8,13 @@ namespace SimLan.Evaluator
         private SimLanParser.BlockContext _body;
         private IList<string> _argNames;
         private IDictionary<string, BaseComputable> _baseVariables;
-        public Function(IList<string> argNames, SimLanParser.BlockContext body, IDictionary<string, BaseComputable> baseVariables)
+        private string _name;
+        public Function(IList<string> argNames, SimLanParser.BlockContext body, IDictionary<string, BaseComputable> baseVariables, string name)
         {
             _body = body;
             _argNames = argNames;
             _baseVariables = baseVariables;
+            _name = name;
         }
 
         public override BaseComputable CallFunction(IList<BaseComputable> args)
@@ -20,7 +22,7 @@ namespace SimLan.Evaluator
             var evaluationContext = new EvaluationContext(_baseVariables);
             if(args.Count != _argNames.Count)
             {
-                throw new System.Exception($"Invalid args number passed to the function, expected {_argNames.Count} but was {args.Count}");
+                throw new Exception($"Invalid args number passed to the function, expected {_argNames.Count} but was {args.Count}");
             }
             for(int i = 0; i < args.Count; i++)
             {
@@ -32,9 +34,12 @@ namespace SimLan.Evaluator
             }catch(ReturnException rex)
             {
                 return rex.Value;
+            }catch(Exception ex)
+            {
+                throw new Exception($"at function {_name}\n{ex.Message}");
             }
 
-            throw new Exception("function has no return path");
+            throw new Exception($"function {_name} has no return path");
         }
     }
 }

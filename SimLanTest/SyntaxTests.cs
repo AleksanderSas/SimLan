@@ -3,7 +3,7 @@ using SimLan.Evaluator;
 
 namespace SimLan
 {
-    public class Tests
+    public class SyntaxTests
     {
         private EvaluationContext evaluator;
 

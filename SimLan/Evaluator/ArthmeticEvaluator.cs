@@ -139,10 +139,28 @@ namespace SimLan.Evaluator
                 return new SimpleValue(int.Parse(context.NUM().GetText()));
             }
 
+            //initialize array
+            if (context.NEW() != null)
+            {
+                return new Array(context.a2.logical_statement_1().Accept(this).GetValue());
+            }
+
             string variableName = context.ID().GetText();
             if (!_evaluationContext.Variables.TryGetValue(variableName, out var runnable))
             {
                 throw new Exception($"{variableName} is unknow");
+            }
+
+            //array
+            if (context._a1.Any())
+            {
+                foreach(var a in context._a1)
+                {
+                    int idx = a.logical_statement_1().Accept(this).GetValue();
+                    runnable = runnable.CallArray(idx);
+
+                }
+                return runnable;
             }
 
             //variable

@@ -1,4 +1,5 @@
 ﻿using Antlr4.Runtime.Misc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -43,7 +44,28 @@ namespace SimLan.Evaluator
         public override Do VisitAssignment([NotNull] SimLanParser.AssignmentContext context)
         {
             var value = context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator);
-            _evaluationContext.Variables[context.ID().GetText()] = value;
+            var varName = context.ID().GetText();
+
+            if(context.array().Any())
+            {
+                var array = _evaluationContext.Variables[context.ID().GetText()];
+
+                foreach(var arrays in context.array().SkipLast(1))
+                {
+                    int idx = arrays.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator).GetValue();
+                    array = array.CallArray(idx);
+                }
+                int idx2 = context.array().Last().logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator).GetValue();
+                array.Assign(idx2, value);
+            }
+            else
+            {
+
+                if (context.VAR() == null && !_evaluationContext.Variables.ContainsKey(varName))
+                    throw new Exception($"{varName} is undefined");
+
+                _evaluationContext.Variables[context.ID().GetText()] = value;
+            }
 
             return Do.Nothing;
         }

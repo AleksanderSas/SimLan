@@ -75,19 +75,19 @@ namespace SimLan
         [Test]
         public void Assign()
         {
-            Assert.AreEqual(42, evaluator.RunProgram("main(){ x = 42; return x; }"));
+            Assert.AreEqual(42, evaluator.RunProgram("main(){ var x = 42; return x; }"));
         }
 
         [Test]
         public void LValueIsNotModified()
         {
-            Assert.AreEqual(16, evaluator.RunProgram("main(){ x = 4; return x + x + x + x; }"));
+            Assert.AreEqual(16, evaluator.RunProgram("main(){ var x = 4; return x + x + x + x; }"));
         }
 
         [Test]
         public void For()
         {
-            Assert.AreEqual(48, evaluator.RunProgram("main(){ x = 42; for(i = 0; i < 3; i = i + 1;) x = x + 2; return x; }"));
+            Assert.AreEqual(48, evaluator.RunProgram("main(){ var x = 42; for(var i = 0; i < 3; i = i + 1;) x = x + 2; return x; }"));
         }
 
         [Test]
@@ -116,6 +116,64 @@ namespace SimLan
         }
 
         [Test]
+        public void VariableAreAssignementByValue()
+        {
+            string program =
+            @"
+            main() {
+               var x = 5;
+               var y = 10;
+               x = y;
+               y = 42;
+               return x;
+            ";
+
+            Assert.AreEqual(10, evaluator.RunProgram(program));
+        }
+
+        [Test]
+        public void Array()
+        {
+            string program =
+            @"
+            main() {
+               var array = new[5];
+               array[0] = 1;
+               array[1] = 2;
+               array[2] = 3;
+               return array[1];
+            ";
+
+            Assert.AreEqual(2, evaluator.RunProgram(program));
+        }
+
+        [Test]
+        public void DoubleArray()
+        {
+            string program =
+            @"
+            main() {
+               var array = new[5];
+               array[0] = 1;
+               array[1] = new [5];
+               array[2] = 3;
+
+               array[1][0] = 10;
+               array[1][1] = 20;
+               array[1][2] = 30;
+               return array[1][1];
+            ";
+
+            Assert.AreEqual(20, evaluator.RunProgram(program));
+        }
+
+        [Test]
+        public void ArraySize()
+        {
+            Assert.AreEqual(5, evaluator.RunProgram("main(){ var a = new[5]; return a(); }"));
+        }
+
+        [Test]
         public void Fibonacci()
         {
             string program =
@@ -140,10 +198,10 @@ namespace SimLan
             string program =
             @"
             fib(n) {
-               x_1 = 1;
-               x_2 = 0;
-               for(i = n; i > 1; i = i - 1;){
-                  tmp = x_2;
+               var x_1 = 1;
+               var x_2 = 0;
+               for(var i = n; i > 1; i = i - 1;){
+                  var tmp = x_2;
                   x_2 = x_1;
                   x_1 = x_1 + tmp;
                }

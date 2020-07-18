@@ -4,7 +4,7 @@ grammar SimLan;
 /*
  * Parser Rules
  */
- program: function+ EOF; 
+program: function+ EOF; 
  
 block: LBRAC e1+=expression* RBRAC | e2=expression;
 expression: if_statement | for_statement | assignment | return_statement;
@@ -16,7 +16,7 @@ function: ID args_def block;
 
 if_statement: IF LPAR logical_statement_1 RPAR b1=block (ELSE b2=block)?;
 for_statement: FOR LPAR a1=assignment logical_statement_1 SEMICOLON a2=assignment RPAR block;
-assignment: ID ASSIGN logical_statement_1 SEMICOLON;
+assignment: ((VAR ID) | ID array*) ASSIGN logical_statement_1 SEMICOLON;
 return_statement: RETURN logical_statement_1 SEMICOLON;
 
 //-------------------------
@@ -38,7 +38,8 @@ arthmetic_statement_2: arthmetic_value arthmetic_statement_2_2;
 arthmetic_statement_2_2: OPERATOR_2 arthmetic_value arthmetic_statement_2_2 | ;
 arthmetic_value: simpleValue | LPAR arthmetic_statement_1 RPAR;
 
-simpleValue: NUM | ID args*;
+array: LSQR_BRAC logical_statement_1 RSQR_BRAC;
+simpleValue: NUM | ID (args+ | a1 += array+ | ) | NEW a2 = array;
 
 /*
  * Lexer Rules
@@ -48,6 +49,8 @@ IF: 'if';
 ELSE: 'else';
 FOR: 'for';
 RETURN: 'return';
+NEW: 'new';
+VAR: 'var';
 
 SEMICOLON: ';';
 COLON: ',';
@@ -63,6 +66,8 @@ LPAR: '(';
 RPAR: ')';
 LBRAC: '{';
 RBRAC: '}';
+LSQR_BRAC: '[';
+RSQR_BRAC: ']';
 
 NUM: [0-9]+;
 ID: [_a-zA-Z][_a-zA-Z0-9]*;

@@ -65,7 +65,7 @@ namespace SimLan.Evaluator
             }
 
             var leftValue = context.v1.Accept(this);
-            if(context.CMP() == null)
+            if (context.CMP() == null)
             {
                 return leftValue;
             }
@@ -88,7 +88,7 @@ namespace SimLan.Evaluator
             var operatorName = sub.OPERATOR_1().GetText();
             var rigthValue = sub.arthmetic_statement_2().Accept(this);
             value.ExecuteOperation(operatorName, rigthValue);
-            if(sub.arthmetic_statement_1_2() != null)
+            if (sub.arthmetic_statement_1_2() != null)
             {
                 return evaluareArthmetic1Sub(value, sub.arthmetic_statement_1_2());
             }
@@ -119,11 +119,11 @@ namespace SimLan.Evaluator
 
         public override BaseComputable VisitArthmetic_value([NotNull] Arthmetic_valueContext context)
         {
-            if(context.simpleValue() != null)
+            if (context.simpleValue() != null)
             {
                 return context.simpleValue().Accept(this);
             }
-            return context.arthmetic_statement_1().Accept(this);
+            return context.logical_statement_1().Accept(this);
         }
 
         public override BaseComputable VisitArthmetic_statement_1_2([NotNull] Arthmetic_statement_1_2Context context)
@@ -134,9 +134,16 @@ namespace SimLan.Evaluator
         public override BaseComputable VisitSimpleValue([NotNull] SimpleValueContext context)
         {
             //simple constant
-            if(context.NUM() != null)
+            if (context.NUM() != null)
             {
                 return new SimpleValue(int.Parse(context.NUM().GetText()));
+            }
+
+            //string
+            if (context.STR() != null)
+            {
+                var str = context.STR().GetText();
+                return new Str(str.Substring(1, str.Length - 2));
             }
 
             //initialize array
@@ -148,13 +155,13 @@ namespace SimLan.Evaluator
             string variableName = context.ID().GetText();
             if (!_evaluationContext.Variables.TryGetValue(variableName, out var runnable))
             {
-                throw new Exception($"{variableName} is unknow");
+                throw new Exception($"{variableName} is unknown");
             }
 
             //array
             if (context._a1.Any())
             {
-                foreach(var a in context._a1)
+                foreach (var a in context._a1)
                 {
                     int idx = a.logical_statement_1().Accept(this).GetValue();
                     runnable = runnable.CallArray(idx);
@@ -164,13 +171,13 @@ namespace SimLan.Evaluator
             }
 
             //variable
-            if(!context.args().Any())
+            if (!context.args().Any())
             {
                 return runnable.Clone();
             }
 
             //function calls
-            foreach(var args in context.args())
+            foreach (var args in context.args())
             {
                 runnable = CallFunction(runnable, args);
             }

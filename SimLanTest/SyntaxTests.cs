@@ -214,5 +214,82 @@ namespace SimLan
 
             Assert.AreEqual(21, evaluator.RunProgram(program));
         }
+
+        [Test]
+        public void StringSize()
+        {
+            Assert.AreEqual(20, evaluator.RunProgram("main(){ var str = 'Wielki test stringow'; return str(); }"));
+        }
+
+        [Test]
+        public void AccessCharFromString()
+        {
+            Assert.AreEqual((int)'i', evaluator.RunProgram("main(){ var str = 'Wielki test stringow';  return str[5]; }"));
+        }
+
+        [Test]
+        public void AccessCharFromString2()
+        {
+            Assert.AreEqual((int)'A', evaluator.RunProgram("main(){ var str = 'Wielki test stringow'; str[5] = 65; return str[5]; }"));
+        }
+
+        [Test]
+        public void StringComparisin()
+        {
+            Assert.AreEqual(1, evaluator.RunProgram("main(){ return 'qwer' == 'qwer'; }"));
+        }
+
+        [Test]
+        public void StringComparisin2()
+        {
+            Assert.AreEqual(0, evaluator.RunProgram("main(){ return 'qwer' <> 'qwer'; }"));
+        }
+
+        [Test]
+        public void LongestCommonSubstr()
+        {
+            string program =
+            @"
+            
+            max(x, y, z)
+            {
+                if(x > y)
+                    if(x > z) return x; else return z;
+                else 
+                    if(y > z) return y; else return z;
+            }
+
+            LCS(s1, s2) {
+               var t = new[s1()];
+               for(var i = 0; i < s1(); i = i + 1;)
+               {
+                  t[i] = new [s2()];
+               }
+
+               t[0][0] = s1[0] == s2[0];
+               for(var x = 1; x < s2(); x = x + 1;)
+               {
+                  t[0][x] = s1[0] == s2[x] || t[0][x-1];
+               }
+
+               for(var y = 1; y < s1(); y = y + 1;)
+               {
+                  t[y][0] = s1[y] == s2[0] || t[y-1][0];
+               }
+
+               for(var y = 1; y < s1(); y = y + 1;)
+                  for(var x = 1; x < s2(); x = x + 1;)
+                  {
+                     t[y][x] = max(t[y-1][x], t[y][x-1], t[y-1][x-1] + (s1[y] == s2[x]));
+                  }
+
+               return t[s1() - 1][s2() - 1];
+            }
+
+            main() { return LCS('abacd', 'cbcaed');}
+            ";
+
+            Assert.AreEqual(3, evaluator.RunProgram(program));
+        }
     }
 }

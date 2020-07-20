@@ -36,10 +36,10 @@ arthmetic_statement_1_2: OPERATOR_1 arthmetic_statement_2 arthmetic_statement_1_
 
 arthmetic_statement_2: arthmetic_value arthmetic_statement_2_2;
 arthmetic_statement_2_2: OPERATOR_2 arthmetic_value arthmetic_statement_2_2 | ;
-arthmetic_value: simpleValue | LPAR arthmetic_statement_1 RPAR;
+arthmetic_value: simpleValue | LPAR logical_statement_1 RPAR;
 
 array: LSQR_BRAC logical_statement_1 RSQR_BRAC;
-simpleValue: NUM | ID (args+ | a1 += array+ | ) | NEW a2 = array;
+simpleValue: NUM | ID (args+ | a1 += array+ | ) | NEW a2 = array | STR;
 
 /*
  * Lexer Rules
@@ -70,6 +70,7 @@ LSQR_BRAC: '[';
 RSQR_BRAC: ']';
 
 NUM: [0-9]+;
+STR: '"' ~('\r' | '\n' | '"')* '"' | '\'' ~('\'' | '\r' | '\n' | '\'')* '\'';
 ID: [_a-zA-Z][_a-zA-Z0-9]*;
 
 WS: [ \t]+ -> skip;

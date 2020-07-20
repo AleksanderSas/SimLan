@@ -29,7 +29,7 @@ logical_statement_1_2: OR logical_statement_2 logical_statement_1_2 | ;
 
 logical_statement_2: logical_value logical_statement_2_2;
 logical_statement_2_2: AND logical_value logical_statement_2_2 | ;
-logical_value: v1=arthmetic_statement_1 (CMP v2=arthmetic_statement_1)? | LPAR logical_statement_1 RPAR;
+logical_value: v1=arthmetic_statement_1 (CMP v2=arthmetic_statement_1)?;
 
 arthmetic_statement_1: arthmetic_statement_2 arthmetic_statement_1_2;
 arthmetic_statement_1_2: OPERATOR_1 arthmetic_statement_2 arthmetic_statement_1_2 | ;

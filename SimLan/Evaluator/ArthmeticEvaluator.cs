@@ -59,11 +59,6 @@ namespace SimLan.Evaluator
 
         public override BaseComputable VisitLogical_value([NotNull] Logical_valueContext context)
         {
-            if (context.logical_statement_1() != null)
-            {
-                return context.logical_statement_1().Accept(this);
-            }
-
             var leftValue = context.v1.Accept(this);
             if (context.CMP() == null)
             {

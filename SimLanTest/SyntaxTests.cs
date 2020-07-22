@@ -216,6 +216,20 @@ namespace SimLan
         }
 
         [Test]
+
+        public void Comment()
+        {
+            var program =
+            @"
+                main(){ 
+                    //return 5;
+                    return 42;
+                }
+            ";
+            Assert.AreEqual(42, evaluator.RunProgram(program));
+        }
+
+        [Test]
         public void StringSize()
         {
             Assert.AreEqual(20, evaluator.RunProgram("main(){ var str = 'Wielki test stringow'; return str(); }"));

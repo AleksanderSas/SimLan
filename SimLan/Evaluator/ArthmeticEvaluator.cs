@@ -134,6 +134,12 @@ namespace SimLan.Evaluator
                 return new SimpleValue(int.Parse(context.NUM().GetText()));
             }
 
+            //simple constant
+            if (context.CHAR() != null)
+            {
+                return new SimpleValue(context.CHAR().GetText()[1]);
+            }
+
             //string
             if (context.STR() != null)
             {

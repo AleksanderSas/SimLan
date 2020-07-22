@@ -73,6 +73,18 @@ namespace SimLan
         }
 
         [Test]
+        public void MultiIfFalseFalse()
+        {
+            Assert.AreEqual(125, evaluator.RunProgram("main(){ if( 0 ) return 42; else if( 0 ) return 10; else return 125; }"));
+        }
+
+        [Test]
+        public void MultiIfFalseTrue()
+        {
+            Assert.AreEqual(10, evaluator.RunProgram("main(){ if( 0 ) return 42; else if( 1 ) return 10; else return 125; }"));
+        }
+
+        [Test]
         public void Assign()
         {
             Assert.AreEqual(42, evaluator.RunProgram("main(){ var x = 42; return x; }"));
@@ -244,7 +256,7 @@ namespace SimLan
         [Test]
         public void AccessCharFromString2()
         {
-            Assert.AreEqual((int)'A', evaluator.RunProgram("main(){ var str = 'Wielki test stringow'; str[5] = 65; return str[5]; }"));
+            Assert.AreEqual((int)'A', evaluator.RunProgram("main(){ var str = 'Wielki test stringow'; str[5] = `A`; return str[5]; }"));
         }
 
         [Test]
@@ -257,6 +269,12 @@ namespace SimLan
         public void StringComparisin2()
         {
             Assert.AreEqual(0, evaluator.RunProgram("main(){ return 'qwer' <> 'qwer'; }"));
+        }
+
+        [Test]
+        public void Char()
+        {
+            Assert.AreEqual(97, evaluator.RunProgram("main(){ return `a`; }"));
         }
 
         [Test]

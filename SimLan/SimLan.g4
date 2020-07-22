@@ -39,7 +39,7 @@ arthmetic_statement_2_2: OPERATOR_2 arthmetic_value arthmetic_statement_2_2 | ;
 arthmetic_value: simpleValue | LPAR logical_statement_1 RPAR;
 
 array: LSQR_BRAC logical_statement_1 RSQR_BRAC;
-simpleValue: NUM | ID (args+ | a1 += array+ | ) | NEW a2 = array | STR;
+simpleValue: NUM | CHAR | ID (args+ | a1 += array+ | ) | NEW a2 = array | STR;
 
 /*
  * Lexer Rules
@@ -71,6 +71,7 @@ RSQR_BRAC: ']';
 
 NUM: [0-9]+;
 STR: '"' ~('\r' | '\n' | '"')* '"' | '\'' ~('\'' | '\r' | '\n' | '\'')* '\'';
+CHAR: '`' ~[`] '`';
 ID: [_a-zA-Z][_a-zA-Z0-9]*;
 
 COMMENT: '//' ~('\r' | '\n')* -> skip;

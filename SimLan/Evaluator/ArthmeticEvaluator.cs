@@ -130,7 +130,9 @@ namespace SimLan.Evaluator
             //simple constant
             if (context.NUM() != null)
             {
-                return new SimpleValue(int.Parse(context.NUM().GetText()));
+                var value = int.Parse(context.NUM().GetText());
+                if (context.OPERATOR_1()?.GetText().Equals("-") ?? false) value = -value;
+                return new SimpleValue(value);
             }
 
             //simple constant

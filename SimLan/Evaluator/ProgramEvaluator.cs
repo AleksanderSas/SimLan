@@ -57,6 +57,11 @@ namespace SimLan.Evaluator
             return Do.Nothing;
         }
 
+        public override Do VisitLoopControll([NotNull] SimLanParser.LoopControllContext context)
+        {
+            throw new LoopControllException(context.BREAK() != null);
+        }
+
         public override Do VisitReturn_statement([NotNull] SimLanParser.Return_statementContext context)
         {
             throw new ReturnException(context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator));
@@ -67,8 +72,30 @@ namespace SimLan.Evaluator
             context.a1.Accept(this);
             while (context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator).GetValue() > 0)
             {
-                context.block().Accept(this);
+                try
+                {
+                    context.block().Accept(this);
+                }catch(LoopControllException ex)
+                {
+                    if (ex.IsBreak) return Do.Nothing;
+                }
                 context.a2.Accept(this);
+            }
+            return Do.Nothing;
+        }
+
+        public override Do VisitWhile_statement([NotNull] SimLanParser.While_statementContext context)
+        {
+            while (context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator).GetValue() > 0)
+            {
+                try
+                {
+                    context.block().Accept(this);
+                }
+                catch (LoopControllException ex)
+                {
+                    if (ex.IsBreak) return Do.Nothing;
+                }
             }
             return Do.Nothing;
         }

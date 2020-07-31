@@ -7,7 +7,8 @@ grammar SimLan;
 program: (function | structDefinition)+ EOF; 
  
 block: LBRAC e1+=expression* RBRAC | e2=expression;
-expression: if_statement | for_statement | assignment | return_statement;
+loopControll: BREAK SEMICOLON | CONTINUE SEMICOLON;
+expression: if_statement | for_statement | while_statement | assignment | return_statement | loopControll;
 
 args: LPAR (a1=logical_statement_1 (COLON a2+=logical_statement_1)* )? RPAR;
 args_def: LPAR (a1=ID (COLON a2+=ID)* )? RPAR;
@@ -16,6 +17,7 @@ function: ID args_def block;
 
 if_statement: IF LPAR logical_statement_1 RPAR b1=block (ELSE b2=block)?;
 for_statement: FOR LPAR a1=assignment logical_statement_1 SEMICOLON a2=assignment RPAR block;
+while_statement: WHILE LPAR logical_statement_1 RPAR block;
 assignment: ((VAR ID) | simpleValue) ASSIGN logical_statement_1 SEMICOLON;
 return_statement: RETURN logical_statement_1 SEMICOLON;
 
@@ -42,7 +44,7 @@ arthmetic_value: simpleValue | LPAR logical_statement_1 RPAR;
 
 array: LSQR_BRAC logical_statement_1 RSQR_BRAC;
 referenceValueResolver: array | DOT ID;
-simpleValue: NUM | CHAR | STR | ID args* referenceValueResolver* | NEW (a2 = array | ID);
+simpleValue: OPERATOR_1? NUM | CHAR | STR | ID args* referenceValueResolver* | NEW (a2 = array | ID);
 
 /*
  * Lexer Rules
@@ -51,7 +53,10 @@ simpleValue: NUM | CHAR | STR | ID args* referenceValueResolver* | NEW (a2 = arr
 IF: 'if';
 ELSE: 'else';
 FOR: 'for';
+WHILE: 'while';
 RETURN: 'return';
+BREAK: 'break';
+CONTINUE: 'continue';
 NEW: 'new';
 VAR: 'var';
 DEF: 'def';

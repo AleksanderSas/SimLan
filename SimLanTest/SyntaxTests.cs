@@ -16,6 +16,8 @@ namespace SimLan
         [Test]
         public void ArthmeticExpressiona()
         {
+            Assert.AreEqual(-1, evaluator.RunArthmetic("-1"));
+            Assert.AreEqual(1, evaluator.RunArthmetic("2 + -1"));
             Assert.AreEqual(3, evaluator.RunArthmetic("1 + 2"));
             Assert.AreEqual(6, evaluator.RunArthmetic("1 + 2 + 3"));
             Assert.AreEqual(-4, evaluator.RunArthmetic("1 - 2 - 3"));
@@ -101,6 +103,36 @@ namespace SimLan
         public void For()
         {
             Assert.AreEqual(48, evaluator.RunProgram("main(){ var x = 42; for(var i = 0; i < 3; i = i + 1;) x = x + 2; return x; }"));
+        }
+
+        [Test]
+        public void For_Break()
+        {
+            Assert.AreEqual(44, evaluator.RunProgram("main(){ var x = 42; for(var i = 0; i < 3; i = i + 1;) { x = x + 2; break; } return x; }"));
+        }
+
+        [Test]
+        public void For_Continue()
+        {
+            Assert.AreEqual(48, evaluator.RunProgram("main(){ var x = 42; for(var i = 0; i < 3; i = i + 1;) { x = x + 2; continue; x = x + 5; } return x; }"));
+        }
+
+        [Test]
+        public void While()
+        {
+            Assert.AreEqual(48, evaluator.RunProgram("main(){ var x = 42; var i = 0; while(i < 3) { i = i + 1; x = x + 2; } return x; }"));
+        }
+
+        [Test]
+        public void While_Break()
+        {
+            Assert.AreEqual(44, evaluator.RunProgram("main(){ var x = 42; var i = 0; while(i < 3) { i = i + 1; x = x + 2; break; } return x; }"));
+        }
+
+        [Test]
+        public void While_Continue()
+        {
+            Assert.AreEqual(48, evaluator.RunProgram("main(){ var x = 42; var i = 0; while(i < 3) { i = i + 1; x = x + 2; continue; x = x + 5; } return x; }"));
         }
 
         [Test]
@@ -229,7 +261,6 @@ namespace SimLan
         }
 
         [Test]
-
         public void Comment()
         {
             var program =

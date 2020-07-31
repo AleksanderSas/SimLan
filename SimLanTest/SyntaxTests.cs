@@ -10,12 +10,13 @@ namespace SimLan
         [SetUp]
         public void Setup()
         {
-            evaluator = new EvaluationContext();
+            evaluator = EvaluationContext.CreateAndReset();
         }
 
         [Test]
         public void ArthmeticExpressiona()
         {
+            Assert.AreEqual(3, evaluator.RunArthmetic("1 + 2"));
             Assert.AreEqual(6, evaluator.RunArthmetic("1 + 2 + 3"));
             Assert.AreEqual(-4, evaluator.RunArthmetic("1 - 2 - 3"));
             Assert.AreEqual(6, evaluator.RunArthmetic("12 - 1 * 5 - 1 "));
@@ -275,6 +276,45 @@ namespace SimLan
         public void Char()
         {
             Assert.AreEqual(97, evaluator.RunProgram("main(){ return `a`; }"));
+        }
+
+        [Test]
+        public void LValueOfArrayElementIsNotModified()
+        {
+            string program =
+            @"
+            main() {
+               var t = new[2];
+               t[0] = 1;
+               t[1] = 2;
+               var x = t[0] > 5;
+               return t[0];
+            }
+            ";
+
+            Assert.AreEqual(1, evaluator.RunProgram(program));
+        }
+
+        [Test]
+        public void Definition()
+        {
+            string program =
+            @"
+            def d1 {
+                var c;
+                var t;
+                var s;
+            }
+
+            main() {
+               var d = new d1;
+               d.t = new [3];
+               d.t[2] = 42;
+               return d.t[2];
+            }
+            ";
+
+            Assert.AreEqual(42, evaluator.RunProgram(program));
         }
 
         [Test]

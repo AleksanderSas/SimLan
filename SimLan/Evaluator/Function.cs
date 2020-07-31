@@ -7,26 +7,26 @@ namespace SimLan.Evaluator
     {
         private SimLanParser.BlockContext _body;
         private IList<string> _argNames;
-        private IDictionary<string, BaseComputable> _baseVariables;
+        private EvaluationContext _evaluationContext;
         private string _name;
-        public Function(IList<string> argNames, SimLanParser.BlockContext body, IDictionary<string, BaseComputable> baseVariables, string name)
+        public Function(IList<string> argNames, SimLanParser.BlockContext body, EvaluationContext evaluationContext, string name)
         {
             _body = body;
             _argNames = argNames;
-            _baseVariables = baseVariables;
+            _evaluationContext = evaluationContext;
             _name = name;
         }
 
         public override BaseComputable CallFunction(IList<BaseComputable> args)
         {
-            var evaluationContext = new EvaluationContext(_baseVariables);
+            var evaluationContext = new EvaluationContext();// _evaluationContext.Clone();
             if(args.Count != _argNames.Count)
             {
                 throw new Exception($"Invalid args number passed to the function, expected {_argNames.Count} but was {args.Count}");
             }
             for(int i = 0; i < args.Count; i++)
             {
-                evaluationContext.Variables.Add(_argNames[i], args[i]);
+                evaluationContext.DeclareVariable(_argNames[i], args[i]);
             }
             try
             {

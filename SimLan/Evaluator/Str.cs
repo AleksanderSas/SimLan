@@ -6,21 +6,21 @@ namespace SimLan.Evaluator
 {
     class Str : BaseComputable
     {
-        private char[] _value;
+        private BaseComputable[] _value;
 
         public Str(string value)
         {
-            _value = value.ToCharArray();
+            _value = value.Select(x => (BaseComputable)new SimpleValue(x)).ToArray();
         }
 
-        private Str(char[] value)
+        private Str(SimpleValue[] value)
         {
-            _value = value; ;
+            _value = value;
         }
 
         public override BaseComputable Clone()
         {
-            return new Str((char[])_value.Clone());
+            return new Str((SimpleValue[])_value.Clone());
         }
 
         public override BaseComputable ExecuteOperation(string opr, BaseComputable rigth)
@@ -30,18 +30,16 @@ namespace SimLan.Evaluator
                 switch (opr)
                 {
                     case "+":
-                        var tmp = new char[_value.Length + s._value.Length];
+                        var tmp = new SimpleValue[_value.Length + s._value.Length];
                         _value.CopyTo(tmp, 0);
                         s._value.CopyTo(tmp, _value.Length);
-                        _value = tmp;
-                        break;
+                        return new Str(tmp);
                     case "==":
                         return new SimpleValue(Enumerable.SequenceEqual(_value, s._value) ? 1 : 0);
                     case "<>":
                         return new SimpleValue(Enumerable.SequenceEqual(_value, s._value) ? 0 : 1);
                     default: throw new Exception($"operator {opr} is unknown");
                 }
-                return this;
             }
             return base.ExecuteOperation(opr, rigth);
         }
@@ -51,14 +49,9 @@ namespace SimLan.Evaluator
             return new SimpleValue(_value.Length);
         }
 
-        public override BaseComputable CallArray(int idx)
+        public override ref BaseComputable CallArray(int idx)
         {
-            return new SimpleValue(_value[idx]);
-        }
-
-        public override void Assign(int idx, BaseComputable value)
-        {
-            _value[idx] = (char)value.GetValue();
+            return ref _value[idx];
         }
     }
 }

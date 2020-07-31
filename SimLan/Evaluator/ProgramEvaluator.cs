@@ -1,5 +1,4 @@
 ﻿using Antlr4.Runtime.Misc;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,7 +25,7 @@ namespace SimLan.Evaluator
 
         public override Do VisitIf_statement([NotNull] SimLanParser.If_statementContext context)
         {
-            if(_evaluationContext.ArthmeticEvaluator.VisitLogical_statement_1(context.logical_statement_1()).GetValue() > 0)
+            if (_evaluationContext.ArthmeticEvaluator.VisitLogical_statement_1(context.logical_statement_1()).GetValue() > 0)
             {
                 context.b1.Accept(this);
             }
@@ -44,27 +43,15 @@ namespace SimLan.Evaluator
         public override Do VisitAssignment([NotNull] SimLanParser.AssignmentContext context)
         {
             var value = context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator);
-            var varName = context.ID().GetText();
 
-            if(context.array().Any())
+            if (context.VAR() != null)
             {
-                var array = _evaluationContext.Variables[context.ID().GetText()];
-
-                foreach(var arrays in context.array().SkipLast(1))
-                {
-                    int idx = arrays.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator).GetValue();
-                    array = array.CallArray(idx);
-                }
-                int idx2 = context.array().Last().logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator).GetValue();
-                array.Assign(idx2, value);
+                _evaluationContext.DeclareVariable(context.ID().GetText(), value);
             }
             else
             {
-
-                if (context.VAR() == null && !_evaluationContext.Variables.ContainsKey(varName))
-                    throw new Exception($"{varName} is undefined");
-
-                _evaluationContext.Variables[context.ID().GetText()] = value;
+                ref var variable = ref _evaluationContext.ArthmeticEvaluator.GetReference(context.simpleValue());
+                variable = value;
             }
 
             return Do.Nothing;
@@ -78,7 +65,7 @@ namespace SimLan.Evaluator
         public override Do VisitFor_statement([NotNull] SimLanParser.For_statementContext context)
         {
             context.a1.Accept(this);
-            while(context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator).GetValue() > 0)
+            while (context.logical_statement_1().Accept(_evaluationContext.ArthmeticEvaluator).GetValue() > 0)
             {
                 context.block().Accept(this);
                 context.a2.Accept(this);
@@ -89,16 +76,22 @@ namespace SimLan.Evaluator
         public override Do VisitFunction([NotNull] SimLanParser.FunctionContext context)
         {
             var funcName = context.ID().GetText();
-            var function = new Function(GetFuncArgs(context.args_def()), context.block(), _evaluationContext.Variables, funcName);
-            _evaluationContext.Variables.Add(funcName, function);
+            var function = new Function(GetFuncArgs(context.args_def()), context.block(), _evaluationContext, funcName);
+            _evaluationContext.DeclareGlobalVariable(funcName, function);
 
+            return Do.Nothing;
+        }
+
+        public override Do VisitStructDefinition([NotNull] SimLanParser.StructDefinitionContext context)
+        {
+            Structure.DefinedStructures.Add(context.name.Text, context._id.Select(x => x.Text).ToList());
             return Do.Nothing;
         }
 
         private IList<string> GetFuncArgs(SimLanParser.Args_defContext argsDef)
         {
             var args = new List<string>();
-            if(argsDef.a1 != null)
+            if (argsDef.a1 != null)
             {
                 args.Add(argsDef.a1.Text);
             }

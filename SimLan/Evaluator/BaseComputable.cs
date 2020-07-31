@@ -19,12 +19,7 @@ namespace SimLan.Evaluator
             throw new System.Exception("Variable is not a function");
         }
 
-        public virtual BaseComputable CallArray(int idx)
-        {
-            throw new System.Exception("Variable is not an array");
-        }
-
-        public virtual void Assign(int idx, BaseComputable value)
+        public virtual ref BaseComputable CallArray(int idx)
         {
             throw new System.Exception("Variable is not an array");
         }
@@ -34,7 +29,7 @@ namespace SimLan.Evaluator
             throw new System.Exception("Variable has no rigth value");
         }
 
-        public virtual BaseComputable Resolve()
+        public virtual ref BaseComputable Resolve(string field)
         {
             throw new System.Exception("Variable is undefined");
         }

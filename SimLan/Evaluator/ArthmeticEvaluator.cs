@@ -1,5 +1,4 @@
 ﻿using Antlr4.Runtime.Misc;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using static SimLan.SimLanParser;
@@ -27,7 +26,7 @@ namespace SimLan.Evaluator
             if (sub.logical_statement_2() == null)
                 return value;
 
-            value.ExecuteOperation("||", sub.logical_statement_2().Accept(this));
+            value = value.ExecuteOperation("||", sub.logical_statement_2().Accept(this));
 
             if (sub.logical_statement_1_2() != null)
             {
@@ -48,7 +47,7 @@ namespace SimLan.Evaluator
             if (sub.logical_value() == null)
                 return value;
 
-            value.ExecuteOperation("&&", sub.logical_value().Accept(this));
+            value = value.ExecuteOperation("&&", sub.logical_value().Accept(this));
 
             if (sub.logical_statement_2_2() != null)
             {
@@ -82,7 +81,7 @@ namespace SimLan.Evaluator
 
             var operatorName = sub.OPERATOR_1().GetText();
             var rigthValue = sub.arthmetic_statement_2().Accept(this);
-            value.ExecuteOperation(operatorName, rigthValue);
+            value = value.ExecuteOperation(operatorName, rigthValue);
             if (sub.arthmetic_statement_1_2() != null)
             {
                 return evaluareArthmetic1Sub(value, sub.arthmetic_statement_1_2());
@@ -104,7 +103,7 @@ namespace SimLan.Evaluator
 
             var operatorName = sub.OPERATOR_2().GetText();
             var rigthValue = sub.arthmetic_value().Accept(this);
-            value.ExecuteOperation(operatorName, rigthValue);
+            value = value.ExecuteOperation(operatorName, rigthValue);
             if (sub.arthmetic_statement_2_2() != null)
             {
                 return evaluareArthmetic2Sub(value, sub.arthmetic_statement_2_2());
@@ -147,42 +146,59 @@ namespace SimLan.Evaluator
                 return new Str(str.Substring(1, str.Length - 2));
             }
 
-            //initialize array
             if (context.NEW() != null)
             {
-                return new Array(context.a2.logical_statement_1().Accept(this).GetValue());
+                if (context.a2 != null)
+                {
+                    return new Array(context.a2.logical_statement_1().Accept(this).GetValue());
+                }else
+                {
+                    return new Structure(context.ID().GetText());
+                }
             }
 
             string variableName = context.ID().GetText();
-            if (!_evaluationContext.Variables.TryGetValue(variableName, out var runnable))
-            {
-                throw new Exception($"{variableName} is unknown");
-            }
-
-            //array
-            if (context._a1.Any())
-            {
-                foreach (var a in context._a1)
-                {
-                    int idx = a.logical_statement_1().Accept(this).GetValue();
-                    runnable = runnable.CallArray(idx);
-
-                }
-                return runnable;
-            }
-
-            //variable
-            if (!context.args().Any())
-            {
-                return runnable.Clone();
-            }
-
-            //function calls
+            var runnable = _evaluationContext.GetVaribale(variableName);
+            
             foreach (var args in context.args())
             {
                 runnable = CallFunction(runnable, args);
             }
+            runnable = Resolve(context, ref runnable);
+
             return runnable;
+        }
+
+        public ref BaseComputable GetReference(SimpleValueContext context)
+        {
+            string variableName = context.ID().GetText();
+            ref var runnable = ref _evaluationContext.GetVaribale(variableName);
+            runnable = ref Resolve(context, ref runnable);
+            return ref runnable;
+        }
+
+
+        private ref BaseComputable Resolve(SimpleValueContext context, ref BaseComputable runnable)
+        {
+            foreach (var subValue in context.referenceValueResolver())
+            {
+                runnable = ref Resolve(runnable, subValue);
+            }
+
+            return ref runnable;
+        }
+
+        private ref BaseComputable Resolve(BaseComputable bs, [NotNull] ReferenceValueResolverContext contex)
+        {
+            if(contex.ID() != null)
+            {
+                return ref bs.Resolve(contex.ID().GetText());
+            }
+            else
+            {
+                int idx = contex.array().logical_statement_1().Accept(this).GetValue();
+                return ref bs.CallArray(idx);
+            }
         }
 
         private BaseComputable CallFunction(BaseComputable function, ArgsContext args)

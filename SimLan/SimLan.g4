@@ -4,7 +4,7 @@ grammar SimLan;
 /*
  * Parser Rules
  */
-program: function+ EOF; 
+program: (function | structDefinition)+ EOF; 
  
 block: LBRAC e1+=expression* RBRAC | e2=expression;
 expression: if_statement | for_statement | assignment | return_statement;
@@ -16,8 +16,10 @@ function: ID args_def block;
 
 if_statement: IF LPAR logical_statement_1 RPAR b1=block (ELSE b2=block)?;
 for_statement: FOR LPAR a1=assignment logical_statement_1 SEMICOLON a2=assignment RPAR block;
-assignment: ((VAR ID) | ID array*) ASSIGN logical_statement_1 SEMICOLON;
+assignment: ((VAR ID) | simpleValue) ASSIGN logical_statement_1 SEMICOLON;
 return_statement: RETURN logical_statement_1 SEMICOLON;
+
+structDefinition: DEF name=ID LBRAC (VAR id+=ID array? SEMICOLON)+ RBRAC;
 
 //-------------------------
 //      CALCULATIONS
@@ -39,7 +41,8 @@ arthmetic_statement_2_2: OPERATOR_2 arthmetic_value arthmetic_statement_2_2 | ;
 arthmetic_value: simpleValue | LPAR logical_statement_1 RPAR;
 
 array: LSQR_BRAC logical_statement_1 RSQR_BRAC;
-simpleValue: NUM | CHAR | ID (args+ | a1 += array+ | ) | NEW a2 = array | STR;
+referenceValueResolver: array | DOT ID;
+simpleValue: NUM | CHAR | STR | ID args* referenceValueResolver* | NEW (a2 = array | ID);
 
 /*
  * Lexer Rules
@@ -51,9 +54,11 @@ FOR: 'for';
 RETURN: 'return';
 NEW: 'new';
 VAR: 'var';
+DEF: 'def';
 
 SEMICOLON: ';';
 COLON: ',';
+DOT: '.';
 
 OPERATOR_1: [+-];
 OPERATOR_2: [/\\*];

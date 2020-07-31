@@ -11,14 +11,9 @@ namespace SimLan.Evaluator
             _data = new BaseComputable[size];
         }
 
-        public override BaseComputable CallArray(int idx)
+        public override ref BaseComputable CallArray(int idx)
         {
-            return _data[idx];
-        }
-
-        public override void Assign(int idx, BaseComputable value)
-        {
-            _data[idx] = value;
+            return ref _data[idx];
         }
 
         public override BaseComputable CallFunction(IList<BaseComputable> args)

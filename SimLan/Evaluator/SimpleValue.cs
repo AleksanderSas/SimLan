@@ -21,51 +21,44 @@ namespace SimLan.Evaluator
             return new SimpleValue(_value);
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is SimpleValue v && v._value == _value;
+        }
+
         public override BaseComputable ExecuteOperation(string opr, BaseComputable rigth)
         {
-            if(rigth is SimpleValue r)
+            if (rigth is SimpleValue r)
             {
-                switch(opr)
+                switch (opr)
                 {
                     case "+":
-                        _value += r._value;
-                        break;
+                        return new SimpleValue(_value + r._value);
                     case "-":
-                        _value -= r._value;
-                        break;
+                        return new SimpleValue(_value - r._value);
                     case "*":
-                        _value *= r._value;
-                        break;
+                        return new SimpleValue(_value * r._value);
                     case "/":
-                        _value /= r._value;
-                        break;
+                        return new SimpleValue(_value / r._value);
                     case "==":
-                        _value = _value == r._value? 1 : 0;
-                        break;
+                        return new SimpleValue(_value == r._value ? 1 : 0);
                     case "<>":
-                        _value = _value != r._value ? 1 : 0;
-                        break;
+                        return new SimpleValue(_value != r._value ? 1 : 0);
                     case "<":
-                        _value = _value < r._value ? 1 : 0;
-                        break;
+                        return new SimpleValue(_value < r._value ? 1 : 0);
                     case ">":
-                        _value = _value > r._value ? 1 : 0;
-                        break;
+                        return new SimpleValue(_value > r._value ? 1 : 0);
                     case ">=":
-                        _value = _value >= r._value ? 1 : 0;
-                        break;
+                        return new SimpleValue(_value >= r._value ? 1 : 0);
                     case "<=":
-                        _value = _value <= r._value ? 1 : 0;
-                        break;
+                        return new SimpleValue(_value <= r._value ? 1 : 0);
                     case "&&":
-                        _value &= r._value;
-                        break;
+                        return new SimpleValue(_value & r._value);
                     case "||":
-                        _value |= r._value;
-                        break;
+                        return new SimpleValue(_value | r._value);
+
                     default: throw new Exception($"operator {opr} is unknown");
                 }
-                return this;
             }
             return base.ExecuteOperation(opr, rigth);
         }

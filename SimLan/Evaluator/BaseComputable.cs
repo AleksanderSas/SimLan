@@ -31,7 +31,7 @@ namespace SimLan.Evaluator
 
         public virtual ref BaseComputable Resolve(string field)
         {
-            throw new System.Exception("Variable is undefined");
+            throw new System.Exception($"Variable {field} is undefined");
         }
     }
 }
